@@ -165,146 +165,93 @@ void PointDefects::updateWindow()
 	
 	// Average number of defects per [111] atomic row.
 	// double averageDefectsPerRow = params().pointDefectConcentration * params().lineLength;
-	double averageDefectsPerRow = 0.2;
-	std::poisson_distribution<int> defectsPerRowDistr(averageDefectsPerRow);
+	// std::poisson_distribution<int> defectsPerRowDistr(averageDefectsPerRow);
 	std::uniform_int_distribution<int> defectDistr(0, 3 * (params().lineLength - 1));
 	std::random_device rd;
     std::mt19937 gen(rd());
+	
 
-	int positions[] = {100, 200};
-	auto ndefects = 2; //sizeof(positions) / sizeof(*positions);
+	// This lambda function randomly positions new point defects on the given atomic row.
 
+	// Create new rows of defects.
+	// for(int sector = 0; sector < 6; sector++) {
+	double x = newCenterX;
+	double y = newCenterY;			
+	auto entry = defects().find(make_pair(x,y));
+		// if(entry != defects().end()) continue;
+		// Determine how many defects to distribute on this new atomic row.
+	int ndefects = 2; //defectsPerRowDistr(gen);
+		// Create point defects.
+	PointDefect* head = nullptr;
+		// Modify MSMR for new defects.
 	double msmr = simulation().simulationPdefectMeanSquareMotionReduced();
 	double msm = simulation().simulationPdefectMeanSquareMotion();
 	msmr += msm * ndefects;
-	context().msgLogger(VERBOSITY_NORMAL) << "ndefects: " << ndefects << endl;
+	simulation().modifySimulationPdefectMeanSquareMotionReduced(msmr);
+	int positions[] = {100, 800};
+
+	for(int k = 0; k < ndefects; k++) {
 	int a;
-	double t;
 	double z;
+	int t;//the Position offset number.
+		// for(;;) {
+	// a = defectDistr(gen);
+	a = positions[k];
+	context().msgLogger(VERBOSITY_NORMAL) << "a: " << a << endl;
+
+	t = a % 3;
+	z = a/3.0;
+	if(x>=y){
+		if ((int)(x-y) % 3 != 0) z += 1.0-(int)(x-y) % 3 /3.0; //the first clockwise.
+	}
+	else{
+		z += (int)(y-x) % 3 /3.0;//the second anti-clockwise.
+	}
+	context().msgLogger(VERBOSITY_NORMAL) << "z: " << z << endl;
+
+	// Check if lattice site is already occupied by another defect.
+	// bool isOccupied = false;
+			// for(PointDefect* pd = head; pd != nullptr; pd = pd->next) {
+			// 	if(pd->position == z) {
+			// 		isOccupied = true;
+			// 		break;
+			// 	}
+			// }
+			// if(!isOccupied) break;
+		// }
+	PointDefect* defect = _defectPool.construct();
+	defect->position = z;
+	defect->type = 1;
+	defect->p_type = t;
 	double x_l;
 	double y_l;
-	PointDefect *head = nullptr;
-	double x = 5.0;
-	double y = 0.0;
-
-	for (int k = 0; k < ndefects; k++)
-	{
-		PointDefect *defect = _defectPool.construct();
-		
-		a = positions[k];
-		t = a % 3;
-		z = a / 3.0;
-		defect->position = z;
-		defect->type = 1;
-		defect->p_type = t;
-		
-		if (t == 0)
-		{
-			x_l = 2.0 / 12.0;
-			y_l = -1.0 / 12.0;
-		}
-		if (t == 1)
-		{
-			x_l = -1.0 / 12.0;
-			y_l = -1.0 / 12.0;
-		}
-		if (t == 2)
-		{
-			x_l = -1.0 / 12.0;
-			y_l = 2.0 / 12.0;
-		}
-
-
-		defect->x = 5;//x + x_l;
-		defect->y = 0;//y + y_l;
-		defect->p0 = getWorldPosition(defect->x, defect->y, z); //[modify for moving solute
-		defect->p1 = getWorldPosition(defect->x, defect->y, z); //]
-		context().msgLogger(VERBOSITY_NORMAL) << "x: " << x + x_l << endl;
-		context().msgLogger(VERBOSITY_NORMAL) << "y: " << y + y_l << endl;
-		context().msgLogger(VERBOSITY_NORMAL) << "z: " << z << endl;
-
-		defect->next = head;
-		head = defect;
+	if (t == 0){
+		x_l= 2.0/12.0;
+		y_l= -1.0/12.0;
 	}
-	defects().insert(make_pair(make_pair(x, y), head));
-		// This lambda function randomly positions new point defects on the given atomic row.
+	if (t == 1){
+		x_l= -1.0/12.0;
+		y_l= -1.0/12.0;
+	}
+	if (t == 2){
+		x_l= -1.0/12.0;
+		y_l= 2.0/12.0;
+	} 
+	defect->x = x+x_l;
+	defect->y = y+y_l;
 
-		// Create new rows of defects.
-		// for(int i = 0; i <= newRadius; i++) {
-		// 	for(int j = 0; j <= newRadius - i; j++) {
-		// 		for(int sector = 0; sector < 6; sector++) {
-		// 			double x = sectorToLattice[sector][0][0] * i + sectorToLattice[sector][0][1] * j + newCenterX;
-		// 			double y = sectorToLattice[sector][1][0] * i + sectorToLattice[sector][1][1] * j + newCenterY;
-		// 					auto entry = defects().find(make_pair(x,y));
-		// 	if(entry != defects().end()) continue;
-		// 	// Determine how many defects to distribute on this new atomic row.
-		// 	int ndefects = defectsPerRowDistr(gen);
-		// 	// Create point defects.
-		// 	PointDefect* head = nullptr;
-		// 	// Modify MSMR for new defects.
-		// 	double msmr = simulation().simulationPdefectMeanSquareMotionReduced();
-		// 	double msm = simulation().simulationPdefectMeanSquareMotion();
-		// 	msmr += msm * ndefects;
-		// 	simulation().modifySimulationPdefectMeanSquareMotionReduced(msmr);
-		// 	for(int k = 0; k < ndefects; k++) {
-		// 		int a;
-		// 		double z;
-		// 		int t;//the Position offset number.
-		// 		for(;;) {
-		// 			a = defectDistr(gen);
-		// 			context().msgLogger(VERBOSITY_NORMAL) << "a: " << a << endl;
-		// 			t = a % 3;
-		// 			z = a/3.0;
-		// 			if(x>=y){
-		// 				if ((int)(x-y) % 3 != 0) z += 1.0-(int)(x-y) % 3 /3.0; //the first clockwise.
-		// 			}
-		// 			else{
-		// 				z += (int)(y-x) % 3 /3.0;//the second anti-clockwise.
-		// 			}
-		// 			// Check if lattice site is already occupied by another defect.
-		// 			bool isOccupied = false;
-		// 			for(PointDefect* pd = head; pd != nullptr; pd = pd->next) {
-		// 				if(pd->position == z) {
-		// 					isOccupied = true;
-		// 					break;
-		// 				}
-		// 			}
-		// 			if(!isOccupied) break;
-		// 		}
-		// 		PointDefect* defect = _defectPool.construct();
-		// 		defect->position = z;
-		// 		defect->type = 1;
-		// 		defect->p_type = t;
-		// 		double x_l;
-		// 		double y_l;
-		// 		if (t == 0){
-		// 			x_l= 2.0/12.0;
-		// 			y_l= -1.0/12.0;
-		// 		}
-		// 		if (t == 1){
-		// 			x_l= -1.0/12.0;
-		// 			y_l= -1.0/12.0;
-		// 		}
-		// 		if (t == 2){
-		// 			x_l= -1.0/12.0;
-		// 			y_l= 2.0/12.0;
-		// 		}
-		// 		defect->x = x+x_l;
-		// 		defect->y = y+y_l;
+	defect-> p0 = getWorldPosition(defect->x,defect->y,z);//[modify for moving solute
+	defect-> p1 = getWorldPosition(defect->x,defect->y,z);//]
 
-		// 		defect-> p0 = getWorldPosition(defect->x,defect->y,z);//[modify for moving solute
-		// 		defect-> p1 = getWorldPosition(defect->x,defect->y,z);//]
-
-		// 		defect->next = head;
-		// 		head = defect;
-		// 	}
-		// defects().insert(make_pair(make_pair(x,y),head));
-		//context().msgLogger(VERBOSITY_NORMAL) << "x,y: " << x << y << endl;
+	defect->next = head;
+	head = defect;
 		// }
-		// }
-	// }
+	defects().insert(make_pair(make_pair(x,y),head));
+		// break;
+		context().msgLogger(VERBOSITY_NORMAL) << "x,y: " << x << y << endl;
+	}
 
-	// // Create new rows of defects for second lattice.
+	// Create new rows of defects for second lattice.
 	// for(int i = 1; i <= newRadius; i++) {
 	// 	for(int j = 0; j <= newRadius - i; j++) {
 	// 		for(int sector = 0; sector < 6; sector++) {
@@ -313,7 +260,7 @@ void PointDefects::updateWindow()
 	// 					auto entry = defects().find(make_pair(x,y));
 	// 	if(entry != defects().end()) continue;
 	// 	// Determine how many defects to distribute on this new atomic row.
-	// 	int ndefects = defectsPerRowDistr(gen);
+	// 	int ndefects = 1; // defectsPerRowDistr(gen);
 	// 	// Create point defects.
 	// 	PointDefect* head = nullptr;
 	// 	// Modify MSMR for new defects.
@@ -326,7 +273,7 @@ void PointDefects::updateWindow()
 	// 		double z;
 	// 		int t;//the Position offset number.
 	// 		for(;;) {
-	// 			a = defectDistr(gen);
+	// 			a = 1; // defectDistr(gen);
 	// 			t = a % 3 + 3;
 	// 			z = a/3.0;
 	// 			if(x>=y){
@@ -343,6 +290,7 @@ void PointDefects::updateWindow()
 	// 					break;
 	// 				}
 	// 			}
+	// 			break;
 	// 			if(!isOccupied) break;
 	// 		}
 	// 		PointDefect* defect = _defectPool.construct();
@@ -375,7 +323,7 @@ void PointDefects::updateWindow()
 	// 		}
 	// 	}
 	// }
-	}
+}
 bool PointDefects::migration(PointDefect* p, double x, double y, double z, double x_line, double y_line, double x1, double y1, double z1,double x1_line, double y1_line, int t){
 	///
 	auto entry = defects().find(make_pair(x1_line,y1_line));

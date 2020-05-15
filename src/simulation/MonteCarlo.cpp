@@ -172,7 +172,7 @@ double Simulation::performIteration()
 	}
 	// Update point defect window when dislocation has moved via kink-pair mechanism.
 	//if(nucleatedKinkPair)
-	pointDefects().updateWindow();
+	// pointDefects().updateWindow();
 
 
 	_simulationStep++;
