@@ -171,7 +171,10 @@ void PointDefects::updateWindow()
 	std::random_device rd;
     std::mt19937 gen(rd());
 
-	int positions[] = {100, 200};
+	int xpositions[] = {5, 5, 5};
+	int ypositions[] = {0, 0, 0};
+	int zpositions[] = {100, 200, 300};
+
 	auto ndefects = 2; //sizeof(positions) / sizeof(*positions);
 
 	double msmr = simulation().simulationPdefectMeanSquareMotionReduced();
@@ -184,14 +187,16 @@ void PointDefects::updateWindow()
 	double x_l;
 	double y_l;
 	PointDefect *head = nullptr;
-	double x = 5.0;
-	double y = 0.0;
+	double x;
+	double y;
 
 	for (int k = 0; k < ndefects; k++)
 	{
 		PointDefect *defect = _defectPool.construct();
-		
-		a = positions[k];
+
+		x = xpositions[k];
+		y = ypositions[k];
+		a = zpositions[k];
 		t = a % 3;
 		z = a / 3.0;
 		defect->position = z;
