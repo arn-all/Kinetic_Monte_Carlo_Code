@@ -2,7 +2,9 @@
 #include "../simulation/Simulation.h"
 #include "../dislocations/Dislocations.h"
 #include <random>
+#include "../nlohmann/json.hpp"
 
+using json = nlohmann::json;
 using namespace std;
 
 /******************************************************************************
