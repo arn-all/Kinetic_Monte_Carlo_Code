@@ -175,7 +175,7 @@ void PointDefects::updateWindow()
 	int ypositions[] = {0, 0, 0};
 	int zpositions[] = {100, 200, 300};
 
-	auto ndefects = 2; //sizeof(positions) / sizeof(*positions);
+	auto ndefects = sizeof(xpositions) / sizeof(*xpositions);
 
 	double msmr = simulation().simulationPdefectMeanSquareMotionReduced();
 	double msm = simulation().simulationPdefectMeanSquareMotion();
