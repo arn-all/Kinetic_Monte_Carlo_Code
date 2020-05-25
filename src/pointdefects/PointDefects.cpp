@@ -220,8 +220,8 @@ void PointDefects::updateWindow()
 		}
 
 
-		defect->x = 5;//x + x_l;
-		defect->y = 0;//y + y_l;
+		defect->x = x + x_l;
+		defect->y = y + y_l;
 		defect->p0 = getWorldPosition(defect->x, defect->y, z); //[modify for moving solute
 		defect->p1 = getWorldPosition(defect->x, defect->y, z); //]
 		context().msgLogger(VERBOSITY_NORMAL) << "x: " << x + x_l << endl;
