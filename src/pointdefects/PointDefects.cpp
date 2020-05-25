@@ -171,9 +171,9 @@ void PointDefects::updateWindow()
 	std::random_device rd;
     std::mt19937 gen(rd());
 
-	int xpositions[] = {5, 5, 5};
-	int ypositions[] = {0, 0, 0};
-	int zpositions[] = {100, 200, 300};
+	int xpositions[] = {5, 5};
+	int ypositions[] = {0, 0};
+	int zpositions[] = {100, 200};
 
 	auto ndefects = sizeof(xpositions) / sizeof(*xpositions);
 
