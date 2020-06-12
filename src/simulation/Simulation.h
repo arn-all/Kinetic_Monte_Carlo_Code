@@ -90,6 +90,7 @@ struct SimulationParameters
 	double pointDefectConcentration;		// The fraction of lattice sites occupied by point defects.
 	double pointDefectWindowRadius;			// Controls the size of the spatial window around the dislocation in which point defects are explicitly modeled (units: lattice constants).
 	double MigrationEnergy;					// Set to True or False (0) to enable/disable solute migration.
+	std::string json_file;                  // Input json file location;
 };
 
 /*

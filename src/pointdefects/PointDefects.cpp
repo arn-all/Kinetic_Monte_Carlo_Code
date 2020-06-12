@@ -173,11 +173,21 @@ void PointDefects::updateWindow()
 	std::random_device rd;
     std::mt19937 gen(rd());
 
-	int xpositions[] = {5, 5};
-	int ypositions[] = {0, 0};
-	int zpositions[] = {100, 200};
+	std::ifstream ifs(params().json_file.c_str(), ios::in);
+	if (!ifs)
+	{
+		std::cout << "Failed to open file" << endl;
+		std::cout << typeid(params().json_file).name() << endl;
+		}
 
-	auto ndefects = sizeof(xpositions) / sizeof(*xpositions);
+	json jf = json::parse(ifs);
+	auto ndefects = jf["pd_pos"].size(); 
+	//sizeof(jf["pd_pos"])/sizeof(*jf["pd_pos"])
+	// int xpositions[] = {5, 5};
+	// int ypositions[] = {0, 0};
+	// int zpositions[] = {100, 200};
+
+	// auto ndefects = sizeof(xpositions) / sizeof(*xpositions);
 
 	double msmr = simulation().simulationPdefectMeanSquareMotionReduced();
 	double msm = simulation().simulationPdefectMeanSquareMotion();
@@ -196,9 +206,9 @@ void PointDefects::updateWindow()
 	{
 		PointDefect *defect = _defectPool.construct();
 
-		x = xpositions[k];
-		y = ypositions[k];
-		a = zpositions[k];
+		x = jf["pd_pos"][k][0];
+		y = jf["pd_pos"][k][1];
+		a = jf["pd_pos"][k][2];
 		t = a % 3;
 		z = a / 3.0;
 		defect->position = z;
