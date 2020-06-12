@@ -89,6 +89,7 @@ struct SimulationParameters
 	double kinkDiffusivityCoefficient;		// The diffusivity of kink motion as linear function of temperature. (default: 0) (units: meter^2/(seconds*kelvin))
 	double pointDefectConcentration;		// The fraction of lattice sites occupied by point defects.
 	double pointDefectWindowRadius;			// Controls the size of the spatial window around the dislocation in which point defects are explicitly modeled (units: lattice constants).
+	double MigrationEnergy;					// Set to True or False (0) to enable/disable solute migration.
 };
 
 /*

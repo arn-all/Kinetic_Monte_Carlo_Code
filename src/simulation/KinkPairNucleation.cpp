@@ -541,7 +541,7 @@ deltaE = - 4.77 * Er * Er - 0.219 * Er - 522 * G * G * G + 32.8 * G * G + 0.77 *
 // first test: activationEnergy = deltaV * 0.35 + deltaE * 0.40;
 //activationEnergy = deltaV * 0.30 + deltaE * 0.35;
 */
-activationEnergy = 0.2;
+activationEnergy = params().MigrationEnergy;
 bool iskinkbool = false;
 bool iskinkorg = false;
 double activep = 0;

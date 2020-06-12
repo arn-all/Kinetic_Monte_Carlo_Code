@@ -64,6 +64,7 @@ int main(int argc, char* argv[])
 			("kink_diffusivity_coeff", po::value<double>(&simulation.params().kinkDiffusivityCoefficient), "The diffusivity of kink motion as linear function of temperature (units: m^2/s/K)")
 			("point_defect_concentration", po::value<double>(&simulation.params().pointDefectConcentration), "The fraction of lattice sites occupied by point defects (valid range: 0 - 1).")
 			("point_defect_window_radius", po::value<double>(&simulation.params().pointDefectWindowRadius), "Controls the size of the spatial window around the dislocation in which point defects are explicitly modeled (units: lattice constants).")
+			("migration_energy", po::value<double>(&simulation.params().MigrationEnergy), "Set the migration energy of solutes. Original value is 0.2 eV.")
 		;
 
 		po::options_description output_options("Output options");
