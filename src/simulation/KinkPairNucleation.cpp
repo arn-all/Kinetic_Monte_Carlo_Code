@@ -169,7 +169,7 @@ bool Simulation::calculateActivationEnergy(const KinkPairNucleationEvent& event,
 	p2.Z = event.kinkPairPosition + params().kinkWidth / 2;
 	
 	if(pointDefects().isSoluteOnTheScrewDislocation(p1,p2))
-		extraq1 = 0.25;
+		extraq1 = params().ebkp; //0.25;
 
 	activationEnergy = (params().kpenergy_deltaH0 + extraq1)* pow(1.0 - pow(s, params().kpenergy_p), params().kpenergy_q);//+0.25
 
