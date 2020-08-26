@@ -367,6 +367,9 @@ return totalRate;
 double Simulation::generateDislocationBindingEventList(vector<DislocationBindingEventList>& devents){
 	double totalRate = 0;
 	double kT = params().temperature * 8.6173324e-5;
+	if (params().allow_debinding == false) {
+		return 0.0;
+	}
 	for(SegmentIterator segment(network()); !segment.atEnd(); ++segment) {
 		if(segment->isKink() == false){
 			continue;
@@ -415,6 +418,8 @@ double Simulation::generateDislocationBindingEventList(vector<DislocationBinding
 		}
 
 	}
+	// context().msgLogger(VERBOSITY_NORMAL) << "rate: " << totalRate << endl;
+	//return 1e-11;
 	return totalRate;
 }
 
