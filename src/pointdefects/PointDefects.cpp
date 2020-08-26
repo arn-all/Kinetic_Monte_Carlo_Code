@@ -182,12 +182,6 @@ void PointDefects::updateWindow()
 
 	json jf = json::parse(ifs);
 	auto ndefects = jf["pd_pos"].size(); 
-	//sizeof(jf["pd_pos"])/sizeof(*jf["pd_pos"])
-	// int xpositions[] = {5, 5};
-	// int ypositions[] = {0, 0};
-	// int zpositions[] = {100, 200};
-
-	// auto ndefects = sizeof(xpositions) / sizeof(*xpositions);
 
 	double msmr = simulation().simulationPdefectMeanSquareMotionReduced();
 	double msm = simulation().simulationPdefectMeanSquareMotion();
