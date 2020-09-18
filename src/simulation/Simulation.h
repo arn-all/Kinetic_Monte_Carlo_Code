@@ -94,6 +94,7 @@ struct SimulationParameters
 	bool allow_debinding;					// Enables/disables the possibility for the dislocation to de-bind itself to the solutes. boolean.
 	bool allow_stacked_kinks;				// Whether  kinks that cross more than one Peierls valley remain stable or not (original behaviour was equivalent to setting this to false). boolean.
 	std::string json_file;                  // Input json file location;
+	std::string solutes_distribution_defined_by; // Specify how the solutes positions will be specified. Either <JSON> or <concentration> keywords are supported (without the <>).;
 };
 
 /*
