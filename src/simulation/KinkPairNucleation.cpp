@@ -374,9 +374,8 @@ double Simulation::generateDislocationBindingEventList(vector<DislocationBinding
 		if(segment->isKink() == false){
 			continue;
 		}
-		Point3 p1 = segment->node1()->pos();
-		Point3 p2 = segment->node2()->pos();
-		if (pointDefects().isSoluteOnTheDislocation(p1,p2))
+
+		if (pointDefects().isSoluteOnTheDislocation(segment->node1()->pos(), segment->node2()->pos()))
 		{
 			DislocationBindingEventList devent1;//Segmenthandle devent = *segment;
 			devent1.p = *segment;

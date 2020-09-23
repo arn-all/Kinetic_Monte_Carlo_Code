@@ -670,31 +670,30 @@ double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& 
 bool PointDefects::isSoluteOnTheDislocation(const Point3& p1, const Point3& p2)
 {		
 		bool Is = false;
-		Vector3 l = p2 - p1;
+		// Vector3 l = p2 - p1;
 		//context().msgLogger(VERBOSITY_NORMAL) << "p1.x: " << p1.X <<"p1.y: " << p1.Y <<"p1.z: " << p1.Z << "p2.z: "<< p2.Z<< endl;
 		for(auto row = defects().begin(); row != defects().end(); ++row) {
-		double x = row->first.first;
-		double y = row->first.second;
-		PointDefect* head = row->second;
-		for(PointDefect* pd = head; pd != nullptr; pd = pd->next) {
-			double z = pd->position;
-			Point3 p3 = getWorldPosition(x,y,z);
-			Point3 p4 = params().inverseUnitCell * p3;
-			//context().msgLogger(VERBOSITY_NORMAL) << "p4.x: " << p4.X <<"p4.y: " << p4.Y <<"p4.z: " << p4.Z << endl;
-			//Point3 p4 = params().inverseUnitCell * pd->p1;
-			/*Vector3 l1 = p3 - p1;
-			if(fabs(sqrt((l.X * l.X +l.Y * l.Y + l.Z * l.Z)*(l1.X * l1.X +l1.Y * l1.Y + l1.Z * l1.Z)) - (l.X * l1.X + l.Y * l1.Y + l.Z * l1.Z)) <= 0.01)
-			{
-				if((l.X * l.X + l.Y * l.Y + l.Z * l.Z) >= (l1.X * l1.X +l1.Y * l1.Y + l1.Z * l1.Z))
+
+			Point3 pxy = params().inverseUnitCell * getWorldPosition(row->first.first, row->first.second, row->second->position);
+			
+			if ((fabs(p1.X - pxy.X) <= 0.001) && (fabs(p1.Y - pxy.Y) <= 0.001)){
+				for (PointDefect *pd = row->second; pd != nullptr; pd = pd->next)
+					{
+					Point3 p4 = params().inverseUnitCell * getWorldPosition(row->first.first, row->first.second, pd->position);
+					if((fabs(p1.Z-p4.Z)<=0.001)||(fabs(p1.Z-p4.Z+params().lineLength)<=0.001)||(fabs(p1.Z-p4.Z-params().lineLength)<=0.001)){
+						Is = true;
+					}
+				}
+			}
+			else if((fabs(p2.X-pxy.X)<=0.001)&&(fabs(p2.Y-pxy.Y)<=0.001)){
+			for (PointDefect *pd = row->second; pd != nullptr; pd = pd->next)
 				{
+				Point3 p4 = params().inverseUnitCell * getWorldPosition(row->first.first, row->first.second, pd->position);
+				if ((fabs(p2.Z - p4.Z) <= 0.001) || (fabs(p2.Z - p4.Z + params().lineLength) <= 0.001) || (fabs(p2.Z - p4.Z - params().lineLength) <= 0.001)){
 					Is = true;
 				}
-			}*/
-			if((fabs(p1.X-p4.X)<=0.001)&&(fabs(p1.Y-p4.Y)<=0.001)&&((fabs(p1.Z-p4.Z)<=0.001)||(fabs(p1.Z-p4.Z+params().lineLength)<=0.001)||(fabs(p1.Z-p4.Z-params().lineLength)<=0.001)))
-				Is = true;
-			if((fabs(p2.X-p4.X)<=0.001)&&(fabs(p2.Y-p4.Y)<=0.001)&&((fabs(p2.Z-p4.Z)<=0.001)||(fabs(p2.Z-p4.Z+params().lineLength)<=0.001)||(fabs(p2.Z-p4.Z-params().lineLength)<=0.001)))
-				Is = true;
-		}
+				}
+			}
 		}
 		//context().msgLogger(VERBOSITY_NORMAL) << "isSoluteOnTheDislocation: " << Is << endl;
 		return Is;
@@ -706,16 +705,13 @@ bool PointDefects::isSoluteOnTheScrewDislocation(const Point3& p1, const Point3&
 		SIMULATION_ASSERT(p1.X == p2.X && p1.Y == p2.Y);
 
 		for(auto row = defects().begin(); row != defects().end(); ++row) {
-		double x = row->first.first;
-		double y = row->first.second;
-		PointDefect* head = row->second;
-			for(PointDefect* pd = head; pd != nullptr; pd = pd->next) {
-			double z = pd->position;
-			Point3 p3 = getWorldPosition(x,y,z);
-			Point3 p4 = params().inverseUnitCell * p3;
-			//Point3 p4 = params().inverseUnitCell * pd->p1;
-			if((fabs(p1.X - p4.X)<=0.001)&&(fabs(p1.Y - p4.Y)<=0.001)&&(((p1.Z <= p4.Z)&&(p2.Z >= p4.Z))||((p1.Z <= (p4.Z + params().lineLength))&&(p2.Z >= (p4.Z + params().lineLength)))||((p1.Z <= (p4.Z - params().lineLength))&&(p2.Z >= (p4.Z - params().lineLength)))))
-				Is = true;
+
+			for (PointDefect *pd = row->second; pd != nullptr; pd = pd->next)
+			{
+				Point3 p4 = params().inverseUnitCell * getWorldPosition(row->first.first, row->first.second, pd->position);
+				//Point3 p4 = params().inverseUnitCell * pd->p1;
+				if((fabs(p1.X - p4.X)<=0.001)&&(fabs(p1.Y - p4.Y)<=0.001)&&(((p1.Z <= p4.Z)&&(p2.Z >= p4.Z))||((p1.Z <= (p4.Z + params().lineLength))&&(p2.Z >= (p4.Z + params().lineLength)))||((p1.Z <= (p4.Z - params().lineLength))&&(p2.Z >= (p4.Z - params().lineLength)))))
+					Is = true;
 			}
 		}
 		return Is;
