@@ -176,7 +176,7 @@ void PointDefects::updateWindow()
 			}
 		json jf = json::parse(ifs); // open json file
 		auto ndefects = jf["pd_pos"].size(); 
-		context().msgLogger(VERBOSITY_NORMAL) << "ndefects: " << ndefects << endl;
+		// context().msgLogger(VERBOSITY_NORMAL) << "ndefects: " << ndefects << endl;
 
 		int a;
 		double t;
@@ -220,9 +220,9 @@ void PointDefects::updateWindow()
 			defect->y = y + y_l;
 			defect->p0 = getWorldPosition(defect->x, defect->y, z); //[modify for moving solute
 			defect->p1 = getWorldPosition(defect->x, defect->y, z); //]
-			context().msgLogger(VERBOSITY_NORMAL) << "x: " << x + x_l << endl;
-			context().msgLogger(VERBOSITY_NORMAL) << "y: " << y + y_l << endl;
-			context().msgLogger(VERBOSITY_NORMAL) << "z: " << z << endl;
+			// context().msgLogger(VERBOSITY_NORMAL) << "x: " << x + x_l << endl;
+			// context().msgLogger(VERBOSITY_NORMAL) << "y: " << y + y_l << endl;
+			// context().msgLogger(VERBOSITY_NORMAL) << "z: " << z << endl;
 
 			defect->next = head;
 			head = defect;
@@ -671,6 +671,7 @@ bool PointDefects::isSoluteOnTheDislocation(const Point3& p1, const Point3& p2)
 {		
 		bool Is = false;
 		Vector3 l = p2 - p1;
+		double tol = 0.1;
 		//context().msgLogger(VERBOSITY_NORMAL) << "p1.x: " << p1.X <<"p1.y: " << p1.Y <<"p1.z: " << p1.Z << "p2.z: "<< p2.Z<< endl;
 		for(auto row = defects().begin(); row != defects().end(); ++row) {
 		double x = row->first.first;
@@ -690,9 +691,9 @@ bool PointDefects::isSoluteOnTheDislocation(const Point3& p1, const Point3& p2)
 					Is = true;
 				}
 			}*/
-			if((fabs(p1.X-p4.X)<=0.001)&&(fabs(p1.Y-p4.Y)<=0.001)&&((fabs(p1.Z-p4.Z)<=0.001)||(fabs(p1.Z-p4.Z+params().lineLength)<=0.001)||(fabs(p1.Z-p4.Z-params().lineLength)<=0.001)))
+			if((fabs(p1.X-p4.X)<=tol)&&(fabs(p1.Y-p4.Y)<=tol)&&((fabs(p1.Z-p4.Z)<=tol)||(fabs(p1.Z-p4.Z+params().lineLength)<=tol)||(fabs(p1.Z-p4.Z-params().lineLength)<=tol)))
 				Is = true;
-			if((fabs(p2.X-p4.X)<=0.001)&&(fabs(p2.Y-p4.Y)<=0.001)&&((fabs(p2.Z-p4.Z)<=0.001)||(fabs(p2.Z-p4.Z+params().lineLength)<=0.001)||(fabs(p2.Z-p4.Z-params().lineLength)<=0.001)))
+			if((fabs(p2.X-p4.X)<=tol)&&(fabs(p2.Y-p4.Y)<=tol)&&((fabs(p2.Z-p4.Z)<=tol)||(fabs(p2.Z-p4.Z+params().lineLength)<=tol)||(fabs(p2.Z-p4.Z-params().lineLength)<=tol)))
 				Is = true;
 		}
 		}

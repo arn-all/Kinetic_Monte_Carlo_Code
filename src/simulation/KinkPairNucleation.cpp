@@ -51,12 +51,14 @@ double Simulation::generateNucleationEventList(vector<KinkPairNucleationEvent>& 
 				double activationEnergy;
 				double frequencyPrefactor;
 				if(!calculateActivationEnergy(event, event.kinkPairWidth, activationEnergy, frequencyPrefactor))
+					// if local stress is negative, ignore the event
 					continue;
 
 				SIMULATION_CHECK_VALUE(activationEnergy);
 				SIMULATION_CHECK_VALUE(event.kinkPairWidth);
 				SIMULATION_ASSERT(event.kinkPairWidth > 0);
 				if(activationEnergy <= 0) {
+					// Raise an error and print logging info
 					context().msgLogger(VERBOSITY_HIGH) << "Kink pair width: " << event.kinkPairWidth << endl;
 					context().msgLogger(VERBOSITY_HIGH) << "Kink pair nucleation activation energy: " << activationEnergy << endl;
 					Point3 nucleationSite = params().unitCell * NodalPosition(event.segment->node1()->pos().X, event.segment->node1()->pos().Y, event.kinkPairPosition);
@@ -70,6 +72,8 @@ double Simulation::generateNucleationEventList(vector<KinkPairNucleationEvent>& 
 				double frequency = frequencyPrefactor * params().nucleationAttemptFrequency / params().numEventsPerSegment;
 				SIMULATION_ASSERT(frequency >= 0);
 				if(frequency == 0)
+				// Happens if the kink size is exactly equal to the sustainable kink separation (SKS)
+				// or if it is below the SKS and s is below an harcoded 0.4 threshold.
 					continue;
 
 				// Compute nucleation rate.

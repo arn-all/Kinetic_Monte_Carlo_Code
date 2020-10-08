@@ -187,17 +187,22 @@ double DislocationNetwork::freeMotionTime()
 							SIMULATION_ASSERT(relativePosition >= 0 && relativePosition < params().pbcLength);
 
 							if(D == 0 || node1->_nodeDiffusionDir - node2->_nodeDiffusionDir == 0) {
+								// if KinkDiffusivity is 0, or both go in the same direction
 								if(relativeVelocity > 0) {
+									// kinks are moving away from each other. They will cross d=(lineLength-relative position)
 									collisionTime = ((double)params().lineLength - relativePosition) / relativeVelocity;
 								}
 								else if(relativeVelocity < 0) {
+									// kinks are moving away from each other. They will cross d=relative position
+
 									collisionTime = relativePosition / -relativeVelocity;
 								}
 								if(collisionTime >= 0 && collisionTime < minTime) minTime = collisionTime;
 							}
 							else {
-								double relativeDiffusionDir = node2->_nodeDiffusionDir - node1->_nodeDiffusionDir;
-								double asq = relativeDiffusionDir * relativeDiffusionDir;
+								// D *
+								double relativeDiffusionDir = node2->_nodeDiffusionDir - node1->_nodeDiffusionDir; // Diff dir is -1, 0, 1 so relativeDiffusionDir is either -1, 1, 2 or -2
+								double asq = relativeDiffusionDir * relativeDiffusionDir; // 4
 								double denom = 1.0 * 2.0 * relativeVelocity * relativeVelocity;
 								double term2 = -4.0 * relativeVelocity * relativePosition + D * asq;
 								if(term2 >= 0) {
@@ -567,5 +572,3 @@ bool DislocationNetwork::isSoluteOnTheDislocation(const Point3& p, bool& iskinkb
 	}
 		return Is;
 }
-
-
