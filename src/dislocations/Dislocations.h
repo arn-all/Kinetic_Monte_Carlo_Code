@@ -369,6 +369,12 @@ public:
 
 	double calculateLocalStressKink(SegmentHandle kinkSegment);
 
+	bool isInPolygon(const Point3& A, const Point3& B, const Point3& C, const Point3& D, const Point3& P);
+	
+	bool isPointOnLeft(const double x1, const double y1, const double x2, const double y2, const double xp, const double yp);
+
+	double firstSoluteAlongZ(SegmentHandle kink1, SegmentHandle kink2);
+
 private:
 
 	/// The list of dislocation loops.

@@ -117,6 +117,7 @@ SegmentHandle DislocationNetwork::lockCrossKink(SegmentHandle screwSegment, Disl
 	SegmentHandle kink1 = screwSegment->prevSegment();
 	SegmentHandle kink2 = screwSegment->nextSegment();
 
+	bool no_annihilation = false;
 	//context().msgLogger(VERBOSITY_HIGH) << "Locking cross kink at screw segment" << screwSegment->node1()->pos() << " - " << screwSegment->node2()->pos() << endl;
 
 	SIMULATION_ASSERT(screwSegment->isScrew());
@@ -127,17 +128,46 @@ SegmentHandle DislocationNetwork::lockCrossKink(SegmentHandle screwSegment, Disl
 		SegmentHandle nextScrew1 = kink1->prevSegment();
 		SegmentHandle nextScrew2 = kink2->nextSegment();
 
-		if(nextScrew1->isScrew()) {
-			displaceKink(kink1, +separation);
+		// search for a solute between the kink1 and kink2
+		double separation_solute = firstSoluteAlongZ(kink1, kink2);
+		
+		if(separation != separation_solute) {
+			// If a solute was found, prevent annihilation
+			no_annihilation = true;
+			// Kinks will be moved to the solute instead
+			separation = separation_solute;
+
+			// determine which solute has to be moved
+			if (nextScrew1->isScrew())
+			{
+				displaceKink(kink1, +separation);
+			}
+			else if (nextScrew2->isScrew())
+			{
+				displaceKink(kink2, separation - screwSegment->getHSegmentLength());
+			}
+			else
+			{
+				displaceKink(kink1, +separation * 0.5);
+				displaceKink(kink2, separation - screwSegment->getHSegmentLength() * 0.5);
+			}
 		}
-		else if(nextScrew2->isScrew()) {
-			displaceKink(kink2, -separation);
-		}
-		else {
-			displaceKink(kink1, +separation * 0.5);
-			displaceKink(kink2, -separation * 0.5);
+		else{
+
+			if(nextScrew1->isScrew()) {
+				displaceKink(kink1, +separation);
+			}
+			else if(nextScrew2->isScrew()) {
+				displaceKink(kink2, -separation);
+			}
+			else {
+				displaceKink(kink1, +separation * 0.5);
+				displaceKink(kink2, -separation * 0.5);
+			}
 		}
 	}
+	if(no_annihilation)	return kink2;
+	
 	SIMULATION_ASSERT(fabs(screwSegment->getHSegmentLength()) <= NODAL_POS_EPSILON);
 
 	// Finally remove degenerate screw segment from dislocation.

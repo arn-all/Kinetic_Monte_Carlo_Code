@@ -1,5 +1,6 @@
 #include "Dislocations.h"
 #include "../simulation/Simulation.h"
+#include "../pointdefects/PointDefects.h"
 
 #include <iomanip>
 
@@ -571,4 +572,83 @@ bool DislocationNetwork::isSoluteOnTheDislocation(const Point3& p, bool& iskinkb
 		//context().msgLogger(VERBOSITY_NORMAL)  << "Is: " << Is << endl;
 	}
 		return Is;
+}
+
+
+bool DislocationNetwork::isInPolygon(const Point3& A, const Point3& B, const Point3& C, const Point3& D, const Point3& P)
+{
+	double xtol = 0.0;
+	double ytol = 0.0;
+	double ztol = 0.0;
+
+	// Check if a point is inside a polygon defined by ABCD
+	if (fabs(A.Y - B.Y) < ytol && fabs(B.Y - C.Y) < ytol && fabs(C.Y - D.Y) < ytol ){ 
+		// if ABCD is at constant Y coordinate
+		if(   (P.Z >= min(min(A.Z, B.Z), D.Z)+ztol)
+			&&(P.Z <= max(max(A.Z, B.Z), D.Z)+ztol) 
+			&&(P.X >= min(min(A.X, B.X), D.X)-xtol)
+			&&(P.X <= max(max(A.X, B.X), D.X)+xtol)
+			&&(P.Y <= max(max(A.Y, B.Y), D.Y)+ytol)
+			&& P.Y >=min(min(A.Y, B.Y), D.Y-ytol))
+			{
+				return true;
+			}
+
+	}
+	else if(fabs(A.X - B.X) < xtol && fabs(B.X - C.X) < xtol && fabs(C.X - D.X) < xtol ){
+		// if ABCD is at constant X coordinate
+		if(   (P.Z >= min(min(A.Z, B.Z), D.Z)-ztol)
+			&&(P.Z <= max(max(A.Z, B.Z), D.Z)+ztol) 
+			&&(P.Y >= min(min(A.Y, B.Y), D.Y)-ytol)
+			&&(P.Y <= max(max(A.Y, B.Y), D.Y)+ytol))
+			{
+				return true;
+			}
+		}
+	
+	return false;
+}
+
+/*******************************************************************************
+* Returns the shortest distance between : 
+* - distance between kink1 and kink2
+* - distances between kink1 and each solute that is between kink1 and kink2.
+********************************************************************************/
+double DislocationNetwork::firstSoluteAlongZ(SegmentHandle kink1, SegmentHandle kink2)
+{
+
+	Point3 node1 = kink1->node1()->pos();
+	Point3 node2 = kink1->node2()->pos();
+	Point3 node3 = kink2->node1()->pos();
+	Point3 node4 = kink2->node2()->pos();
+	double delta_z = params().lineLength - fabs(fmod(node4.Z - node1.Z, params().lineLength));
+
+	for (auto row = simulation().pointDefects().defects().begin(); row != simulation().pointDefects().defects().end(); ++row)
+	{
+		double x = row->first.first;
+		double y = row->first.second;
+		PointDefect *head = row->second;
+		list<Point3> p_match;
+
+		for (PointDefect *pd = head; pd != nullptr; pd = pd->next)
+		{
+			double z = pd->position;
+			Point3 solute = params().inverseUnitCell * simulation().pointDefects().getWorldPosition(x, y, z);
+
+			if (isInPolygon(node1, node2, node3, node4, solute))
+				{
+
+				if (fabs(fmod(node1.Z - solute.Z, params().lineLength)) <= delta_z)
+				{
+					// select the smallest delta_z value possible
+					delta_z = fabs(fmod(node1.Z - solute.Z, params().lineLength));
+					context().msgLogger(VERBOSITY_NORMAL) << "found solute " << solute << endl;
+				}
+			}
+			else context().msgLogger(VERBOSITY_NORMAL) << "Skipped solute " << solute << endl;
+			}
+	}
+context().msgLogger(VERBOSITY_NORMAL) << "Delta z " << delta_z << endl;
+
+return delta_z;
 }
