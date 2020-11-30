@@ -95,6 +95,7 @@ struct SimulationParameters
 	bool allow_stacked_kinks;				// Whether  kinks that cross more than one Peierls valley remain stable or not (original behaviour was equivalent to setting this to false). boolean.
 	std::string json_file;                  // Input json file location;
 	std::string solutes_distribution_defined_by; // Specify how the solutes positions will be specified. Either <JSON> or <concentration> keywords are supported (without the <>).;
+	bool allow_cross_kinks;						 // Enables/disables the possibility of nucleating cross-kinks. Boolean.;
 };
 
 /*
