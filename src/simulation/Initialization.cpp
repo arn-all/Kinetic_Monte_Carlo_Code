@@ -159,6 +159,7 @@ void Simulation::initialize()
 	context().msgLogger(VERBOSITY_NORMAL) << "Number of simulation steps:          " << params().numSimulationSteps << endl;
 	context().msgLogger(VERBOSITY_NORMAL) << "Print interval:                      " << params().printEveryNTimesteps << endl;
 	context().msgLogger(VERBOSITY_NORMAL) << "Output interval:                     " << params().outputEveryNTimesteps << endl;
+	context().msgLogger(VERBOSITY_NORMAL) << "Solutes defined by :                 " << params().solutes_distribution_defined_by << endl;
 	context().msgLogger(VERBOSITY_NORMAL) << "---------------------------------------------" << endl;
 
 	// Set up initial dislocation configuration.
