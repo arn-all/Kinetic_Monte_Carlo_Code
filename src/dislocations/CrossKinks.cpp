@@ -118,6 +118,7 @@ SegmentHandle DislocationNetwork::lockCrossKink(SegmentHandle screwSegment, Disl
 	SegmentHandle kink2 = screwSegment->nextSegment();
 
 	bool no_annihilation = false;
+	double separation_solute;
 	//context().msgLogger(VERBOSITY_HIGH) << "Locking cross kink at screw segment" << screwSegment->node1()->pos() << " - " << screwSegment->node2()->pos() << endl;
 
 	SIMULATION_ASSERT(screwSegment->isScrew());
@@ -129,15 +130,26 @@ SegmentHandle DislocationNetwork::lockCrossKink(SegmentHandle screwSegment, Disl
 		SegmentHandle nextScrew2 = kink2->nextSegment();
 
 		// search for a solute between the kink1 and kink2
-		double separation_solute = firstSoluteAlongZ(kink1, kink2);
+		Point3 kink1node1 = kink1->node1()->pos() ;
+		Point3 kink1node2 = kink1->node2()->pos() ;
+
+		if(kink1node1.X <= kink1node2.X){
+			kink1node2.X = kink1node1.X + 0.5*(kink1node2.X-kink1node1.X);
+			separation_solute = simulation().pointDefects().bindPointDefects(kink1node1, kink1node2, separation);
+		}
+		else{
+			kink1node1.X = kink1node1.X + 0.5 * (kink1node2.X - kink1node1.X);
+			separation_solute = simulation().pointDefects().bindPointDefects(kink1node1, kink1node2, separation);
+		}
 		
 		if(separation != separation_solute) {
+			context().msgLogger(VERBOSITY_HIGH) << "Found solute ============================================================= " << endl;
+
 			// If a solute was found, prevent annihilation
 			no_annihilation = true;
 			// Kinks will be moved to the solute instead
 			separation = separation_solute;
-
-			// determine which solute has to be moved
+			// determine which kink has to be moved
 			if (nextScrew1->isScrew())
 			{
 				displaceKink(kink1, +separation);
