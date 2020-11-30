@@ -4,3 +4,4 @@ bin/cmake_install.cmake
 bin/Makefile
 .vscode/
 bin/
+*.pyc
