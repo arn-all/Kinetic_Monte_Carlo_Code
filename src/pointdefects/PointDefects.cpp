@@ -176,7 +176,6 @@ void PointDefects::updateWindow()
 			}
 		json jf = json::parse(ifs); // open json file
 		auto ndefects = jf["pd_pos"].size(); 
-		// context().msgLogger(VERBOSITY_NORMAL) << "ndefects: " << ndefects << endl;
 
 		int a;
 		double t;
@@ -220,9 +219,6 @@ void PointDefects::updateWindow()
 			defect->y = y + y_l;
 			defect->p0 = getWorldPosition(defect->x, defect->y, z); //[modify for moving solute
 			defect->p1 = getWorldPosition(defect->x, defect->y, z); //]
-			// context().msgLogger(VERBOSITY_NORMAL) << "x: " << x + x_l << endl;
-			// context().msgLogger(VERBOSITY_NORMAL) << "y: " << y + y_l << endl;
-			// context().msgLogger(VERBOSITY_NORMAL) << "z: " << z << endl;
 
 			defect->next = head;
 			head = defect;
@@ -534,6 +530,7 @@ double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& 
 	double Z = deltaZ;
 	double Z2 = deltaZ;
 	double Z3 = deltaZ;
+	double window = 0.001;
 	for(auto row = defects().begin(); row != defects().end(); ++row) {
 		double x = row->first.first;
 		double y = row->first.second;
@@ -544,19 +541,19 @@ double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& 
 			Point3 p3 = params().inverseUnitCell * p2;
 			if(deltaZ >0)
 			{
-				if((fabs(p0.X-p3.X)<=0.001)&&(fabs(p0.Y-p3.Y)<=0.001)&&(p3.Z >= p0.Z && (p0.Z + deltaZ) >= p3.Z))
+				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z >= p0.Z && (p0.Z + deltaZ) >= p3.Z))
 				{
 					Z = p3.Z - p0.Z;
 					if(Z < Z3)
 						Z3 = Z;
 				}
-				if((fabs(p0.X-p3.X)<=0.001)&&(fabs(p0.Y-p3.Y)<=0.001)&&(p3.Z >= (p0.Z + params().lineLength) && (p0.Z + params().lineLength + deltaZ) >= p3.Z))
+				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z >= (p0.Z + params().lineLength) && (p0.Z + params().lineLength + deltaZ) >= p3.Z))
 				{
 					Z = p3.Z - (p0.Z + params().lineLength);
 					if(Z < Z3)
 						Z3 = Z;
 				}
-				if((fabs(p0.X-p3.X)<=0.001)&&(fabs(p0.Y-p3.Y)<=0.001)&&(p3.Z >= (p0.Z - params().lineLength) && (p0.Z - params().lineLength + deltaZ) >= p3.Z))
+				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z >= (p0.Z - params().lineLength) && (p0.Z - params().lineLength + deltaZ) >= p3.Z))
 				{
 					Z = p3.Z - (p0.Z - params().lineLength);
 					if(Z < Z3)
@@ -564,19 +561,19 @@ double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& 
 				}
 
 
-				if((fabs(p1.X-p3.X)<=0.001)&&(fabs(p1.Y-p3.Y)<=0.001)&&(p3.Z >= p1.Z && (p1.Z + deltaZ) >= p3.Z))
+				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z >= p1.Z && (p1.Z + deltaZ) >= p3.Z))
 				{
 					Z2 = p3.Z - p1.Z;
 					if(Z2 < Z3)
 						Z3 = Z2;
 				}
-				if((fabs(p1.X-p3.X)<=0.001)&&(fabs(p1.Y-p3.Y)<=0.001)&&(p3.Z>= (p1.Z+params().lineLength) && (p1.Z + params().lineLength + deltaZ) >= p3.Z))
+				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z>= (p1.Z+params().lineLength) && (p1.Z + params().lineLength + deltaZ) >= p3.Z))
 				{
 					Z2 = p3.Z - (p1.Z+params().lineLength);
 					if(Z2 < Z3)
 						Z3 = Z2;
 				}
-				if((fabs(p1.X-p3.X)<=0.001)&&(fabs(p1.Y-p3.Y)<=0.001)&&(p3.Z >= (p1.Z - params().lineLength) && (p1.Z - params().lineLength+ deltaZ) >= p3.Z))
+				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z >= (p1.Z - params().lineLength) && (p1.Z - params().lineLength+ deltaZ) >= p3.Z))
 				{
 					Z2 = p3.Z - (p1.Z-params().lineLength);
 					if(Z2 < Z3)
@@ -587,19 +584,19 @@ double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& 
 			else
 			{
 
-				if((fabs(p0.X-p3.X)<=0.001)&&(fabs(p0.Y-p3.Y)<=0.001)&&(p3.Z <= p0.Z && (p0.Z + deltaZ) <= p3.Z))
+				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z <= p0.Z && (p0.Z + deltaZ) <= p3.Z))
 				{
 					Z = p3.Z - p0.Z;
 					if (Z > Z3)
 						Z3 = Z;
 				}
-				if((fabs(p0.X-p3.X)<=0.001)&&(fabs(p0.Y-p3.Y)<=0.001)&&(p3.Z<= (p0.Z + params().lineLength) && (p0.Z + params().lineLength + deltaZ) <= p3.Z))
+				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z<= (p0.Z + params().lineLength) && (p0.Z + params().lineLength + deltaZ) <= p3.Z))
 				{
 					Z = p3.Z - (p0.Z + params().lineLength);
 					if (Z > Z3)
 						Z3 = Z;
 				}
-				if((fabs(p0.X-p3.X)<=0.001)&&(fabs(p0.Y-p3.Y)<=0.001)&&(p3.Z <= (p0.Z - params().lineLength) && (p0.Z - params().lineLength+ deltaZ) <= p3.Z))
+				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z <= (p0.Z - params().lineLength) && (p0.Z - params().lineLength+ deltaZ) <= p3.Z))
 				{
 					Z = p3.Z - (p0.Z - params().lineLength);
 					if (Z > Z3)
@@ -607,19 +604,19 @@ double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& 
 				}
 
 
-				if((fabs(p1.X-p3.X)<=0.001)&&(fabs(p1.Y-p3.Y)<=0.001)&&(p3.Z <= p1.Z && (p1.Z + deltaZ) <= p3.Z))
+				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z <= p1.Z && (p1.Z + deltaZ) <= p3.Z))
 				{
 					Z2 = p3.Z - p1.Z;
 					if (Z2 > Z3)
 						Z3 = Z2;
 				}
-				if((fabs(p1.X-p3.X)<=0.001)&&(fabs(p1.Y-p3.Y)<=0.001)&&(p3.Z<= (p1.Z + params().lineLength) && (p1.Z + params().lineLength + deltaZ) <= p3.Z))
+				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z<= (p1.Z + params().lineLength) && (p1.Z + params().lineLength + deltaZ) <= p3.Z))
 				{
 					Z2 = p3.Z - (p1.Z + params().lineLength);
 					if (Z2 > Z3)
 						Z3 = Z2;
 				}
-				if((fabs(p1.X-p3.X)<=0.001)&&(fabs(p1.Y-p3.Y)<=0.001)&&(p3.Z <= (p1.Z - params().lineLength) && (p1.Z - params().lineLength+ deltaZ) <= p3.Z))
+				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z <= (p1.Z - params().lineLength) && (p1.Z - params().lineLength+ deltaZ) <= p3.Z))
 				{
 					Z2 = p3.Z - (p1.Z - params().lineLength);
 					if (Z2 > Z3)
@@ -670,8 +667,10 @@ double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& 
 bool PointDefects::isSoluteOnTheDislocation(const Point3& p1, const Point3& p2)
 {		
 		bool Is = false;
+		double windowX = 0.1;
+		double windowY = 0.1;
+		double windowZ = 3;
 		Vector3 l = p2 - p1;
-		double tol = 0.1;
 		//context().msgLogger(VERBOSITY_NORMAL) << "p1.x: " << p1.X <<"p1.y: " << p1.Y <<"p1.z: " << p1.Z << "p2.z: "<< p2.Z<< endl;
 		for(auto row = defects().begin(); row != defects().end(); ++row) {
 		double x = row->first.first;
@@ -691,10 +690,12 @@ bool PointDefects::isSoluteOnTheDislocation(const Point3& p1, const Point3& p2)
 					Is = true;
 				}
 			}*/
-			if((fabs(p1.X-p4.X)<=tol)&&(fabs(p1.Y-p4.Y)<=tol)&&((fabs(p1.Z-p4.Z)<=tol)||(fabs(p1.Z-p4.Z+params().lineLength)<=tol)||(fabs(p1.Z-p4.Z-params().lineLength)<=tol)))
+			if((fabs(p1.X-p4.X)<=windowX)&&(fabs(p1.Y-p4.Y)<=windowY)&&((fabs(p1.Z-p4.Z)<=windowZ)||(fabs(p1.Z-p4.Z+params().lineLength)<=windowZ)||(fabs(p1.Z-p4.Z-params().lineLength)<=windowZ))){
 				Is = true;
-			if((fabs(p2.X-p4.X)<=tol)&&(fabs(p2.Y-p4.Y)<=tol)&&((fabs(p2.Z-p4.Z)<=tol)||(fabs(p2.Z-p4.Z+params().lineLength)<=tol)||(fabs(p2.Z-p4.Z-params().lineLength)<=tol)))
+				context().msgLogger(VERBOSITY_NORMAL) << "found :" << p4 << endl;}
+			if((fabs(p2.X-p4.X)<=windowX)&&(fabs(p2.Y-p4.Y)<=windowY)&&((fabs(p2.Z-p4.Z)<=windowZ)||(fabs(p2.Z-p4.Z+params().lineLength)<=windowZ)||(fabs(p2.Z-p4.Z-params().lineLength)<=windowZ))){
 				Is = true;
+				context().msgLogger(VERBOSITY_NORMAL) << "found :" << p4 << endl;}
 		}
 		}
 		//context().msgLogger(VERBOSITY_NORMAL) << "isSoluteOnTheDislocation: " << Is << endl;
