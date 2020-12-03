@@ -90,6 +90,7 @@ void Simulation::initialize()
 	_params.pbcLength = _params.blength * _params.lineLength;
 
 	// List of kink directions (expressed in terms of primitive cell vectors. all are <111>/2 type).
+	if (_params.allow_cross_kinks){
 	_params.kinkDirections.resize(6);
 	_params.kinkDirections[0].h = NodalVector(+1,  0, +1.0/3.0);
 	_params.kinkDirections[1].h = NodalVector(-1,  0, -1.0/3.0);
@@ -103,6 +104,15 @@ void Simulation::initialize()
 	_params.kinkDirections[3].reverseDirection = 2;
 	_params.kinkDirections[4].reverseDirection = 5;
 	_params.kinkDirections[5].reverseDirection = 4;
+	}
+	else {
+		_params.kinkDirections.resize(2);
+		_params.kinkDirections[0].h = NodalVector(+1, 0, +1.0 / 3.0);
+		_params.kinkDirections[1].h = NodalVector(-1, 0, -1.0 / 3.0);
+		_params.kinkDirections[0].reverseDirection = 1;
+		_params.kinkDirections[1].reverseDirection = 0;
+	}
+
 	for(int i = 0; i < _params.kinkDirections.size(); i++) {
 		_params.kinkDirections[i].h_spatial = _params.unitCell * _params.kinkDirections[i].h;
 		_params.kinkDirections[i].h_mag = Length(_params.kinkDirections[i].h_spatial);
