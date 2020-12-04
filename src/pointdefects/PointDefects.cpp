@@ -526,101 +526,131 @@ bool PointDefects::migration(PointDefect* p, double x, double y, double z, doubl
 
 }
 
-double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& deltaZ){
+double PointDefects::bindPointDefects(const Point3 &p0, const Point3 &p1, double &deltaZ)
+{
 	double Z = deltaZ;
 	double Z2 = deltaZ;
 	double Z3 = deltaZ;
-	double window = 0.001;
-	for(auto row = defects().begin(); row != defects().end(); ++row) {
+	double window_x = 0.1;
+	double window_y = 0.1;
+
+	for (auto row = defects().begin(); row != defects().end(); ++row)
+	{
 		double x = row->first.first;
 		double y = row->first.second;
-		PointDefect* head = row->second;
-		for(PointDefect* pd = head; pd != nullptr; pd = pd->next) {
+		PointDefect *head = row->second;
+		for (PointDefect *pd = head; pd != nullptr; pd = pd->next)
+		{
 			double z = pd->position;
-			Point3 p2 = getWorldPosition(x,y,z);
+			Point3 p2 = getWorldPosition(x, y, z);
 			Point3 p3 = params().inverseUnitCell * p2;
-			if(deltaZ >0)
+			if (deltaZ > 0)
 			{
-				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z >= p0.Z && (p0.Z + deltaZ) >= p3.Z))
+				if ((fabs(p0.X - p3.X) <= window_x) && (fabs(p0.Y - p3.Y) <= window_y))
 				{
-					Z = p3.Z - p0.Z;
-					if(Z < Z3)
-						Z3 = Z;
-				}
-				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z >= (p0.Z + params().lineLength) && (p0.Z + params().lineLength + deltaZ) >= p3.Z))
-				{
-					Z = p3.Z - (p0.Z + params().lineLength);
-					if(Z < Z3)
-						Z3 = Z;
-				}
-				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z >= (p0.Z - params().lineLength) && (p0.Z - params().lineLength + deltaZ) >= p3.Z))
-				{
-					Z = p3.Z - (p0.Z - params().lineLength);
-					if(Z < Z3)
-						Z3 = Z;
-				}
-
-
-				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z >= p1.Z && (p1.Z + deltaZ) >= p3.Z))
-				{
-					Z2 = p3.Z - p1.Z;
-					if(Z2 < Z3)
-						Z3 = Z2;
-				}
-				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z>= (p1.Z+params().lineLength) && (p1.Z + params().lineLength + deltaZ) >= p3.Z))
-				{
-					Z2 = p3.Z - (p1.Z+params().lineLength);
-					if(Z2 < Z3)
-						Z3 = Z2;
-				}
-				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z >= (p1.Z - params().lineLength) && (p1.Z - params().lineLength+ deltaZ) >= p3.Z))
-				{
-					Z2 = p3.Z - (p1.Z-params().lineLength);
-					if(Z2 < Z3)
-						Z3 = Z2;
+					if (p3.Z >= p0.Z && (p0.Z + deltaZ) >= p3.Z)
+					{
+						Z = p3.Z - p0.Z;
+						if (Z < Z3){
+							Z3 = Z;
+							}
+						
+					}
+					if (p3.Z >= (p0.Z + params().lineLength) && (p0.Z + params().lineLength + deltaZ) >= p3.Z)
+					{
+						Z = p3.Z - (p0.Z + params().lineLength);
+						if (Z < Z3){
+							Z3 = Z;
+							}
+						
+					}
+					if (p3.Z >= (p0.Z - params().lineLength) && (p0.Z - params().lineLength + deltaZ) >= p3.Z)
+					{
+						Z = p3.Z - (p0.Z - params().lineLength);
+						if (Z < Z3){
+							Z3 = Z;
+							}
+						
+					}
 				}
 
+				if ((fabs(p1.X - p3.X) <= window_x) && (fabs(p1.Y - p3.Y) <= window_y))
+				{
+					if (p3.Z >= p1.Z && (p1.Z + deltaZ) >= p3.Z)
+					{
+						Z2 = p3.Z - p1.Z;
+						if (Z2 < Z3){
+							Z3 = Z2;
+						}
+					}
+					if (p3.Z >= (p1.Z + params().lineLength) && (p1.Z + params().lineLength + deltaZ) >= p3.Z)
+					{
+						Z2 = p3.Z - (p1.Z + params().lineLength);
+						if (Z2 < Z3){
+							Z3 = Z2;
+						}
+					}	
+					if (p3.Z >= (p1.Z - params().lineLength) && (p1.Z - params().lineLength + deltaZ) >= p3.Z)
+					{
+						Z2 = p3.Z - (p1.Z - params().lineLength);
+						if (Z2 < Z3){
+							Z3 = Z2;
+						}
+					}
+				}
 			}
 			else
 			{
+				if ((fabs(p0.X - p3.X) <= window_x) && (fabs(p0.Y - p3.Y) <= window_y))
+				{
 
-				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z <= p0.Z && (p0.Z + deltaZ) <= p3.Z))
-				{
-					Z = p3.Z - p0.Z;
-					if (Z > Z3)
-						Z3 = Z;
-				}
-				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z<= (p0.Z + params().lineLength) && (p0.Z + params().lineLength + deltaZ) <= p3.Z))
-				{
-					Z = p3.Z - (p0.Z + params().lineLength);
-					if (Z > Z3)
-						Z3 = Z;
-				}
-				if((fabs(p0.X-p3.X)<=window)&&(fabs(p0.Y-p3.Y)<=window)&&(p3.Z <= (p0.Z - params().lineLength) && (p0.Z - params().lineLength+ deltaZ) <= p3.Z))
-				{
-					Z = p3.Z - (p0.Z - params().lineLength);
-					if (Z > Z3)
-						Z3 = Z;
+					if (p3.Z <= p0.Z && (p0.Z + deltaZ ) <= p3.Z)
+					{
+						Z = p3.Z - p0.Z;
+						if (Z > Z3){
+							Z3 = Z;
+						}
+					}
+					if (p3.Z <= (p0.Z + params().lineLength) && (p0.Z + params().lineLength + deltaZ ) <= p3.Z)
+					{
+						Z = p3.Z - (p0.Z + params().lineLength);
+						if (Z > Z3){
+							Z3 = Z;
+						}
+					}
+					if (p3.Z <= (p0.Z - params().lineLength) && (p0.Z - params().lineLength + deltaZ ) <= p3.Z)
+					{
+						Z = p3.Z - (p0.Z - params().lineLength);
+						if (Z > Z3){
+							Z3 = Z;
+						}
+					}
 				}
 
+				if ((fabs(p1.X - p3.X) <= window_x) && (fabs(p1.Y - p3.Y) <= window_y))
+				{
 
-				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z <= p1.Z && (p1.Z + deltaZ) <= p3.Z))
-				{
-					Z2 = p3.Z - p1.Z;
-					if (Z2 > Z3)
-						Z3 = Z2;
-				}
-				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z<= (p1.Z + params().lineLength) && (p1.Z + params().lineLength + deltaZ) <= p3.Z))
-				{
-					Z2 = p3.Z - (p1.Z + params().lineLength);
-					if (Z2 > Z3)
-						Z3 = Z2;
-				}
-				if((fabs(p1.X-p3.X)<=window)&&(fabs(p1.Y-p3.Y)<=window)&&(p3.Z <= (p1.Z - params().lineLength) && (p1.Z - params().lineLength+ deltaZ) <= p3.Z))
-				{
-					Z2 = p3.Z - (p1.Z - params().lineLength);
-					if (Z2 > Z3)
-						Z3 = Z2;
+					if (p3.Z <= p1.Z && (p1.Z + deltaZ) <= p3.Z)
+					{
+						Z2 = p3.Z - p1.Z;
+						if (Z2 > Z3){
+							Z3 = Z2;
+						}
+					}
+					if (p3.Z <= (p1.Z + params().lineLength) && (p1.Z + params().lineLength + deltaZ) <= p3.Z)
+					{
+						Z2 = p3.Z - (p1.Z + params().lineLength);
+						if (Z2 > Z3){
+							Z3 = Z2;
+						}
+					}
+					if (p3.Z <= (p1.Z - params().lineLength) && (p1.Z - params().lineLength + deltaZ) <= p3.Z)
+					{
+						Z2 = p3.Z - (p1.Z - params().lineLength);
+						if (Z2 > Z3){
+							Z3 = Z2;
+						}
+					}
 				}
 			}
 			//Vector3 l = p1 - p0;
@@ -661,6 +691,7 @@ double PointDefects::bindPointDefects(const Point3& p0,const Point3& p1,double& 
 
 		}
 	}
+
 	return Z3;
 }
 
