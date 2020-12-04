@@ -683,7 +683,7 @@ bool PointDefects::isSoluteOnTheDislocation(const Point3& p1, const Point3& p2)
 		bool Is = false;
 		double windowX = 0.1;
 		double windowY = 0.1;
-		double windowZ = 3;
+		double windowZ = 6;
 		Vector3 l = p2 - p1;
 		//context().msgLogger(VERBOSITY_NORMAL) << "p1.x: " << p1.X <<"p1.y: " << p1.Y <<"p1.z: " << p1.Z << "p2.z: "<< p2.Z<< endl;
 		for(auto row = defects().begin(); row != defects().end(); ++row) {
