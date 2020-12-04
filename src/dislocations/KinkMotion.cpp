@@ -283,11 +283,25 @@ double DislocationNetwork::minTimeForBind(double t_mig)
 			nodep1displacement += diffusional_displacement;
 		else if(nodep1->_nodeDiffusionDir == -1)
 			nodep1displacement -= diffusional_displacement;
-		
 
 		Point3 nodep1p = nodep1->pos();
 		Point3 nodep2p = nodep2->pos();
-		double temp1Z = simulation().pointDefects().bindPointDefects(nodep1p,nodep2p,nodep1displacement);
+		// Local rule for Fe-C : For a kink going from valley A to B, solutes should bind to the kink 
+		// only if they are in valley A. 
+		double temp1Z;
+
+		if (nodep1p.X <= nodep2p.X)
+		{
+			nodep2p.X = nodep1p.X + 0.5 * (nodep2p.X - nodep1p.X);
+			temp1Z = simulation().pointDefects().bindPointDefects(nodep1p, nodep2p, nodep1displacement);
+		}
+		else
+		{
+			nodep1p.X = nodep1p.X + 0.5 * (nodep2p.X - nodep1p.X);
+			temp1Z = simulation().pointDefects().bindPointDefects(nodep1p, nodep2p, nodep1displacement);
+		}
+
+		// double temp1Z = simulation().pointDefects().bindPointDefects(nodep1p,nodep2p,nodep1displacement);
 
 		double sign = 0;
 
