@@ -39,7 +39,7 @@ IF(ENABLE_DEBUG_CHECKS)
 	SET(BASE_COMPILE_DEFINITIONS "DEBUG_SIMULATION")
 ENDIF()
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O1 -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -g -O0 -std=c++11")
 
 ###################################################################
 # Build executable.
