@@ -62,106 +62,120 @@ void PointDefects::updateWindow()
 
 	// Remove rows of defects which are no longer within the window.
 
-	for(auto row = defects().begin(); row != defects().end(); ) {
-		int x = row->first.first - newCenterX;
-		int y = row->first.second - newCenterY;
-		int dist;
-		if(x >= 0) {
-			if(y >= 0) dist = x+y;
-			else if(x >= -y) dist = x;
-			else dist = -y;
-		}
-		else {
-			if(y <= 0) dist = -(x+y);
-			else if(y <= -x) dist = -x;
-			else dist = y;
-		}
-		if(dist <= newRadius)
-			++row;
-		else {
-			PointDefect* pd = row->second;
-			// period condition
-			PointDefect* head = nullptr;
-			double new_x;
-			if(x>0){
-			new_x=newCenterX-(x-1);
+	if (params().solutes_distribution_defined_by == "concentration"){
+		for (auto row = defects().begin(); row != defects().end();)
+		{
+			int x = row->first.first - newCenterX;
+			int y = row->first.second - newCenterY;
+			int dist;
+			if (x >= 0)
+			{
+				if (y >= 0)
+					dist = x + y;
+				else if (x >= -y)
+					dist = x;
+				else
+					dist = -y;
 			}
-			else if(x==0){
-			new_x=newCenterX;
+			else
+			{
+				if (y <= 0)
+					dist = -(x + y);
+				else if (y <= -x)
+					dist = -x;
+				else
+					dist = y;
 			}
-			else{
-			new_x=newCenterX-(x+1);
-			}
-			double new_y=y;
-			if(y>0){
-			new_y=newCenterY-(y-1);
-			}
-			else if(y==0){
-			new_y=newCenterY;
-			}
-			else{
-			new_y=newCenterY-(y+1);
-			}
-			auto entrynew = defects().find(make_pair(new_x,new_y));
+			if (dist <= newRadius)
+				++row;
+			else
+			{
+				PointDefect *pd = row->second;
+				// period condition
+				PointDefect *head = nullptr;
+				double new_x;
+				if (x > 0)
+				{
+					new_x = newCenterX - (x - 1);
+				}
+				else if (x == 0)
+				{
+					new_x = newCenterX;
+				}
+				else{
+					new_x=newCenterX-(x+1);
+					}
+				double new_y=y;
+				if(y>0){
+					new_y=newCenterY-(y-1);
+				}
+				else if(y==0){
+					new_y=newCenterY;
+				}
+				else{
+					new_y=newCenterY-(y+1);
+				}
+				auto entrynew = defects().find(make_pair(new_x,new_y));
 
-			while(pd != nullptr) {
-				PointDefect* nextpd = pd->next;
-				//period condition
-				if (entrynew != defects().end()){
-				PointDefect* pnew = entrynew->second;
-				bool isOccupied = false;
-				for(PointDefect* pt = pnew; pt != nullptr; pt = pt->next) {
+				while(pd != nullptr) {
+					PointDefect* nextpd = pd->next;
+					//period condition
+					if (entrynew != defects().end()){
+						PointDefect* pnew = entrynew->second;
+						bool isOccupied = false;
+						for(PointDefect* pt = pnew; pt != nullptr; pt = pt->next) {
 							if(pt->position == pd->position) {
 								isOccupied = true;
 								break;
 							}
 						}
-				if(!isOccupied){
-					PointDefect* defect = _defectPool.construct();
-					defect->position = pd->position;
-					defect->type = pd->type;
-					defect->p_type = pd->p_type;
-					defect->x = new_x;
-					defect->y = new_y;
-					defect->p0 = getWorldPosition(defect->x,defect->y,defect->position);//[modify for moving solute
-					defect->p1 = getWorldPosition(defect->x,defect->y,defect->position);//
-					defect->next = nullptr;
+						if(!isOccupied){
+							PointDefect* defect = _defectPool.construct();
+							defect->position = pd->position;
+							defect->type = pd->type;
+							defect->p_type = pd->p_type;
+							defect->x = new_x;
+							defect->y = new_y;
+							defect->p0 = getWorldPosition(defect->x,defect->y,defect->position);//[modify for moving solute
+							defect->p1 = getWorldPosition(defect->x,defect->y,defect->position);//
+							defect->next = nullptr;
 
-					PointDefect* pl = pnew;
-					if(pnew != nullptr){
-					while(pl->next != nullptr){
-						pl = pl->next;
-					}
-					pl->next = defect;
+							PointDefect* pl = pnew;
+							if(pnew != nullptr){
+								while(pl->next != nullptr){
+									pl = pl->next;
+								}
+								pl->next = defect;
+							}
+							else{
+								entrynew->second = defect;//maybe wrong
+							}
+						}	
 					}
 					else{
-						entrynew->second = defect;//maybe wrong
+						PointDefect* defect = _defectPool.construct();
+						defect->position = pd->position;
+						defect->type = pd->type;
+						defect->p_type = pd->p_type;
+						defect->x = new_x;
+						defect->y = new_y;
+						defect->p0 = getWorldPosition(defect->x,defect->y,defect->position);//[modify for moving solute
+						defect->p1 = getWorldPosition(defect->x,defect->y,defect->position);//]
+						defect->next = head;
+						head=defect;
 					}
-				}	
-				}
-				else{
-				PointDefect* defect = _defectPool.construct();
-				defect->position = pd->position;
-				defect->type = pd->type;
-				defect->p_type = pd->p_type;
-				defect->x = new_x;
-				defect->y = new_y;
-				defect->p0 = getWorldPosition(defect->x,defect->y,defect->position);//[modify for moving solute
-				defect->p1 = getWorldPosition(defect->x,defect->y,defect->position);//]
-				defect->next = head;
-				head=defect;
-				}
 
-				double msmr = simulation().simulationPdefectMeanSquareMotionReduced();
-				msmr += (pd->p1.X - pd->p0.X)*(pd->p1.X - pd->p0.X) + (pd->p1.Y - pd->p0.Y)*(pd->p1.Y - pd->p0.Y) + (pd->p1.Z - pd->p0.Z)*(pd->p1.Z - pd->p0.Z);
-				simulation().modifySimulationPdefectMeanSquareMotionReduced(msmr);
+					double msmr = simulation().simulationPdefectMeanSquareMotionReduced();
+					msmr += (pd->p1.X - pd->p0.X)*(pd->p1.X - pd->p0.X) + (pd->p1.Y - pd->p0.Y)*(pd->p1.Y - pd->p0.Y) + (pd->p1.Z - pd->p0.Z)*(pd->p1.Z - pd->p0.Z);
+					simulation().modifySimulationPdefectMeanSquareMotionReduced(msmr);
 
-				_defectPool.destroy(pd);
-				pd = nextpd;
+					_defectPool.destroy(pd);
+					pd = nextpd;
+				}
+				row = defects().erase(row);
+				//period condition
+				if (entrynew != defects().end()) defects().insert(make_pair(make_pair(new_x,new_y),head));
 			}
-			row = defects().erase(row);
-			//period condition
-			if (entrynew != defects().end()) defects().insert(make_pair(make_pair(new_x,new_y),head));
 		}
 	}
 
