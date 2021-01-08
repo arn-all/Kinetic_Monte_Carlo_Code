@@ -26,3 +26,13 @@ CXX=g++
 cmake ../src
 make -j 4
 ```
+
+## GNU Debugger 
+
+Example use case for setting a breakpoint at src/pointdefects/PointDefects.cpp:549 which will be active at the 37th timestep. Requires `SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -g -O0 -std=c++11")` in `src/CMakeLists.txt`
+
+```
+gdb bin/DislocationKMC
+b src/pointdefects/PointDefects.cpp:549 if simulation().simulationStep()==37
+r --config test.config
+```
