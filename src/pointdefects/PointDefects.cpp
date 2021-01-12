@@ -751,7 +751,7 @@ bool PointDefects::isSoluteOnTheScrewDislocation(const Point3& p1, const Point3&
 {
 		bool Is = false;
 		SIMULATION_ASSERT(p1.X == p2.X && p1.Y == p2.Y);
-
+		double windowX = 2/sqrt(6)*params().latticeParameter;
 		for(auto row = defects().begin(); row != defects().end(); ++row) {
 		double x = row->first.first;
 		double y = row->first.second;
@@ -761,7 +761,7 @@ bool PointDefects::isSoluteOnTheScrewDislocation(const Point3& p1, const Point3&
 			Point3 p3 = getWorldPosition(x,y,z);
 			Point3 p4 = params().inverseUnitCell * p3;
 			//Point3 p4 = params().inverseUnitCell * pd->p1;
-			if((fabs(p1.X - p4.X)<=0.001)&&(fabs(p1.Y - p4.Y)<=0.001)&&(((p1.Z <= p4.Z)&&(p2.Z >= p4.Z))||((p1.Z <= (p4.Z + params().lineLength))&&(p2.Z >= (p4.Z + params().lineLength)))||((p1.Z <= (p4.Z - params().lineLength))&&(p2.Z >= (p4.Z - params().lineLength)))))
+			if ((fabs(p1.X - p4.X) <= windowX) && (fabs(p1.Y - p4.Y) <= 0.001) && (((p1.Z <= p4.Z) && (p2.Z >= p4.Z)) || ((p1.Z <= (p4.Z + params().lineLength)) && (p2.Z >= (p4.Z + params().lineLength))) || ((p1.Z <= (p4.Z - params().lineLength)) && (p2.Z >= (p4.Z - params().lineLength)))))
 				Is = true;
 			}
 		}

@@ -166,16 +166,33 @@ bool Simulation::calculateActivationEnergy(const KinkPairNucleationEvent& event,
 	// Calculate kink pair separation.
 	sustainableKinkSeparation = params().kpwidth_l0 * (pow(s, -params().kpwidth_p) + params().kpwidth_w0) * pow(1.0 - s, -params().kpwidth_q);
 	SIMULATION_ASSERT(sustainableKinkSeparation > 0);
-	double extraq1 = 0;
+	double H = 0;
 	Point3 p1 = event.segment->node1()->pos();
 	Point3 p2 = event.segment->node2()->pos();
     p1.Z = event.kinkPairPosition - params().kinkWidth / 2; 
 	p2.Z = event.kinkPairPosition + params().kinkWidth / 2;
-	
-	if(pointDefects().isSoluteOnTheScrewDislocation(p1,p2))
-		extraq1 = params().ebkp; //0.25;
 
-	activationEnergy = (params().kpenergy_deltaH0 + extraq1)* pow(1.0 - pow(s, params().kpenergy_p), params().kpenergy_q);//+0.25
+	SegmentHandle prev = event.segment->prevSegment();
+	SegmentHandle next = event.segment->nextSegment();
+	double segmentLen = event.segment->getHSegmentLength();
+
+	if (pointDefects().isSoluteOnTheDislocation(prev->node1()->pos(), prev->node2()->pos()) & pointDefects().isSoluteOnTheDislocation(next->node1()->pos(), next->node2()->pos()))
+	{
+
+		if (pointDefects().isSoluteOnTheScrewDislocation(p1, p2))
+		{
+			// then nucleation is easier
+			H = params().kpenergy_deltaH0 - params().ebkp;
+		}
+		else{
+			H = params().kpenergy_deltaH0 + 2*params().ebkp; // or a function of segmentLen;
+		}
+	}
+	else{
+		H = params().kpenergy_deltaH0 + params().ebkp; // or a function of segmentLen
+	}
+
+	activationEnergy = H* pow(1.0 - pow(s, params().kpenergy_p), params().kpenergy_q);
 
 	
 	frequencyPrefactor = event.segment->getHSegmentLength() - sustainableKinkSeparation;
