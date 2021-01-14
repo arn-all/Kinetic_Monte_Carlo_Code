@@ -737,10 +737,12 @@ bool PointDefects::isSoluteOnTheDislocation(const Point3& p1, const Point3& p2)
 			}*/
 			if((fabs(p1.X-p4.X)<=windowX)&&(fabs(p1.Y-p4.Y)<=windowY)&&((fabs(p1.Z-p4.Z)<=windowZ)||(fabs(p1.Z-p4.Z+params().lineLength)<=windowZ)||(fabs(p1.Z-p4.Z-params().lineLength)<=windowZ))){
 				Is = true;
-				context().msgLogger(VERBOSITY_NORMAL) << "found :" << p4 << endl;}
+				// context().msgLogger(VERBOSITY_NORMAL) << "found :" << p4 << endl;
+				}
 			if((fabs(p2.X-p4.X)<=windowX)&&(fabs(p2.Y-p4.Y)<=windowY)&&((fabs(p2.Z-p4.Z)<=windowZ)||(fabs(p2.Z-p4.Z+params().lineLength)<=windowZ)||(fabs(p2.Z-p4.Z-params().lineLength)<=windowZ))){
 				Is = true;
-				context().msgLogger(VERBOSITY_NORMAL) << "found :" << p4 << endl;}
+				// context().msgLogger(VERBOSITY_NORMAL) << "found :" << p4 << endl;
+				}
 		}
 		}
 		//context().msgLogger(VERBOSITY_NORMAL) << "isSoluteOnTheDislocation: " << Is << endl;
@@ -752,6 +754,8 @@ bool PointDefects::isSoluteOnTheScrewDislocation(const Point3& p1, const Point3&
 		bool Is = false;
 		SIMULATION_ASSERT(p1.X == p2.X && p1.Y == p2.Y);
 		double windowX = 2/sqrt(6)*params().latticeParameter;
+		double windowY = 0.1;
+		double windowZ = 3;
 		for(auto row = defects().begin(); row != defects().end(); ++row) {
 		double x = row->first.first;
 		double y = row->first.second;
@@ -761,7 +765,16 @@ bool PointDefects::isSoluteOnTheScrewDislocation(const Point3& p1, const Point3&
 			Point3 p3 = getWorldPosition(x,y,z);
 			Point3 p4 = params().inverseUnitCell * p3;
 			//Point3 p4 = params().inverseUnitCell * pd->p1;
-			if ((fabs(p1.X - p4.X) <= windowX) && (fabs(p1.Y - p4.Y) <= 0.001) && (((p1.Z <= p4.Z) && (p2.Z >= p4.Z)) || ((p1.Z <= (p4.Z + params().lineLength)) && (p2.Z >= (p4.Z + params().lineLength))) || ((p1.Z <= (p4.Z - params().lineLength)) && (p2.Z >= (p4.Z - params().lineLength)))))
+			if ((fabs(p1.X - p4.X) <= windowX) 
+				&& (fabs(p1.Y - p4.Y) <= windowY) 
+				&& (
+					((p1.Z-windowZ <= p4.Z) && (p2.Z+windowZ >= p4.Z)) 
+					|| ((p1.Z-windowZ <= (p4.Z + params().lineLength)) 
+						&& (p2.Z+windowZ >= (p4.Z + params().lineLength))) 
+					|| ((p1.Z-windowZ <= (p4.Z - params().lineLength)) 
+						&& (p2.Z+windowZ >= (p4.Z - params().lineLength)))
+					)
+				)
 				Is = true;
 			}
 		}

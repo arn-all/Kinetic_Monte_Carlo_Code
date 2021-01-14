@@ -176,22 +176,41 @@ bool Simulation::calculateActivationEnergy(const KinkPairNucleationEvent& event,
 	SegmentHandle next = event.segment->nextSegment();
 	double segmentLen = event.segment->getHSegmentLength();
 
-	if (pointDefects().isSoluteOnTheDislocation(prev->node1()->pos(), prev->node2()->pos()) & pointDefects().isSoluteOnTheDislocation(next->node1()->pos(), next->node2()->pos()))
+	if (prev->isKink() 
+	    & next->isKink()
+		& pointDefects().isSoluteOnTheDislocation(prev->node1()->pos(), prev->node2()->pos()) 
+		& pointDefects().isSoluteOnTheDislocation(next->node1()->pos(), next->node2()->pos()))
 	{
+		// between 2 kinks that are binded to C
 
-		if (pointDefects().isSoluteOnTheScrewDislocation(p1, p2))
-		{
-			// then nucleation is easier
-			H = params().kpenergy_deltaH0 - params().ebkp;
+		if (pointDefects().isSoluteOnTheScrewDislocation(event.segment->node1()->pos(), event.segment->node2()->pos()))
+		{	
+			// if C is aligned to the segment 
+			if (prev->kinkDirection()==1 & next->kinkDirection()==0){
+				// if segment with C is behind
+				// then nucleation is easier,  to let it align with the segment ahead
+				H = params().kpenergy_deltaH0 - params().ebkp;
+			}
+			else{
+				// if segment is ahead
+				// wait for the segment let behind to align with C
+				H = params().kpenergy_deltaH0 + 3*params().ebkp;
+			}
 		}
 		else{
+			// second jump (H2)
 			H = params().kpenergy_deltaH0 + 2*params().ebkp; // or a function of segmentLen;
 		}
 	}
 	else{
+		// first jump (H1)
 		H = params().kpenergy_deltaH0 + params().ebkp; // or a function of segmentLen
 	}
 
+	if (pointDefects().isSoluteOnTheScrewDislocation(p1, p2)){
+		// In case the double kink would have to nucleate ON a solute itself, add a cost (simiar to Zhao 2020)
+		H += params().ebkp;
+	}
 	activationEnergy = H* pow(1.0 - pow(s, params().kpenergy_p), params().kpenergy_q);
 
 	
